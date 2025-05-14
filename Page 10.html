@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - EcoHabitat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Playfair Display', serif;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .alert-message {
+            animation: slideIn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+        .error-field {
+            border-color: #ef4444 !important;
+            animation: shake 0.6s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-[#f4e1d2] min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-8 md:p-12 lg:p-16">
+        <div id="successMessage" class="hidden alert-message mb-8 bg-[#4a5d3b] text-white p-6 rounded-lg text-center space-y-3 border-2 border-[#3d4d2f]">
+            <div class="flex items-center justify-center space-x-4">
+                <i class="fas fa-check-circle text-3xl"></i>
+                <p class="text-2xl font-bold">Message envoyé avec succès !</p>
+            </div>
+            <p class="text-lg">Nous vous répondrons dans les plus brefs délais.</p>
+        </div>
+
+        <div id="errorMessage" class="hidden alert-message mb-8 bg-[#d16d3b] text-white p-6 rounded-lg text-center space-y-3 border-2 border-[#b35a2c]">
+            <div class="flex items-center justify-center space-x-4">
+                <i class="fas fa-exclamation-triangle text-3xl"></i>
+                <p class="text-2xl font-bold">Champs obligatoires manquants</p>
+            </div>
+            <p id="errorText" class="text-lg"></p>
+        </div>
+
+        <form class="space-y-8" id="contactForm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-3">
+                    <label class="block text-[#5a6e32] font-medium text-lg">Prénom *</label>
+                    <input type="text" id="prenom" 
+                           class="w-full p-4 border-2 border-[#d16d3b] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a5d3b] text-[#4a5d3b] placeholder-[#a3b18a]">
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-[#5a6e32] font-medium text-lg">Nom *</label>
+                    <input type="text" id="nom" 
+                           class="w-full p-4 border-2 border-[#d16d3b] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a5d3b] text-[#4a5d3b] placeholder-[#a3b18a]">
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-[#5a6e32] font-medium text-lg">Email *</label>
+                    <input type="email" id="email" 
+                           class="w-full p-4 border-2 border-[#d16d3b] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a5d3b] text-[#4a5d3b] placeholder-[#a3b18a]">
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-[#5a6e32] font-medium text-lg">Téléphone *</label>
+                    <input type="tel" id="telephone" 
+                           class="w-full p-4 border-2 border-[#d16d3b] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a5d3b] text-[#4a5d3b] placeholder-[#a3b18a]">
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <label class="block text-[#5a6e32] font-medium text-lg">Message *</label>
+                <textarea rows="5" id="message"
+                          class="w-full p-4 border-2 border-[#d16d3b] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a5d3b] text-[#4a5d3b] placeholder-[#a3b18a]"></textarea>
+            </div>
+
+            <div class="text-center pt-6">
+                <button type="submit" 
+                        class="bg-[#d16d3b] text-white px-16 py-5 rounded-xl hover:bg-[#b35a2c] transition-all duration-300 text-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105">
+                    Envoyer le message
+                    <i class="fas fa-paper-plane ml-3"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('contactForm');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+
+            const showMessage = (element, duration = 7000) => {
+                element.classList.remove('hidden');
+                setTimeout(() => element.classList.add('hidden'), duration);
+            };
+
+            const formatFieldList = (fields) => {
+                if (fields.length > 1) {
+                    return `${fields.slice(0, -1).join(', ')} et ${fields[fields.length - 1]}`;
+                }
+                return fields[0];
+            };
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                document.querySelectorAll('.error-field').forEach(field => {
+                    field.classList.remove('error-field', 'border-red-500');
+                });
+                
+                const fields = [
+                    { id: 'prenom', name: 'prénom' },
+                    { id: 'nom', name: 'nom' },
+                    { id: 'email', name: 'email' },
+                    { id: 'telephone', name: 'téléphone' },
+                    { id: 'message', name: 'message' }
+                ];
+
+                const missingFields = fields
+                    .filter(({ id }) => !document.getElementById(id).value.trim())
+                    .map(({ name }) => `le ${name}`);
+
+                if (missingFields.length === 0) {
+                    showMessage(successMessage);
+                    form.reset();
+                } else {
+                    missingFields.forEach((_, index) => {
+                        const field = fields[index];
+                        document.getElementById(field.id).classList.add('error-field');
+                    });
+
+                    const formattedFields = formatFieldList(missingFields);
+                    errorText.innerHTML = `Veuillez remplir ${formattedFields}.<br>Merci de votre compréhension.`;
+                    showMessage(errorMessage, 10000);
+                }
+            });
+
+            document.querySelectorAll('input, textarea').forEach(field => {
+                field.addEventListener('input', () => {
+                    if (field.classList.contains('error-field')) {
+                        field.classList.remove('error-field');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
